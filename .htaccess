@@ -1,0 +1,26 @@
+Options -Indexes
+IndexIgnore *
+#ErrorDocument 400 /portal/400
+DirectoryIndex index.php
+order deny,allow
+<Files ~ "^\.(htaccess|htpasswd)$">
+deny from all
+</Files>
+
+Header set X-Content-Type-Options "nosniff"
+Header set X-FRAME-OPTIONS "SAMEORIGIN"
+Header set X-XSS-Protection "1; mode=block"
+Header set Cache-Control "public, max-age=60"
+Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+RewriteEngine On
+RewriteRule ^/?ajax/(.*)$   ajax.php?$1 [NC,QSA,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*?)$ index.php [QSA,L]
+RewriteCond %{REQUEST_METHOD} GET
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=(\.\.//?)+ [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=/([a-z0-9_.]//?)+ [NC]
+RewriteRule .* - [F]
